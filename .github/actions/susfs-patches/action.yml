@@ -102,6 +102,17 @@ runs:
           echo "Applying super.c Android 14 6.1 Fake Patch"
           sed -i '/^#include <trace\/hooks\/fs.h>$/,+1 d' fs/super.c
         fi
+        # 6.1.145: trace/hooks/blk.h is gone from GKI, so the SUSFS preamble hunk of
+        # fs/namespace.c cannot apply. Insert the two blocks it carries by stable
+        # anchors (idempotent; no-op when the hunk did apply).
+        echo "Applying namespace.c SUSFS preamble compat (android14 6.1)"
+        grep -q 'linux/susfs_def.h' fs/namespace.c || sed -i \
+          '/^#include <linux\/mnt_idmapping.h>$/a #ifdef CONFIG_KSU_SUSFS\n#include <linux/susfs_def.h>\n#endif // #ifdef CONFIG_KSU_SUSFS' \
+          fs/namespace.c
+        grep -q 'susfs_is_current_ksu_domain' fs/namespace.c || sed -i \
+          '/^#include "internal.h"$/a #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT\nextern bool susfs_is_current_ksu_domain(void);\nextern struct static_key_true susfs_is_sdcard_android_data_not_decrypted;\n\n#define CL_COPY_MNT_NS BIT(25) /* used by copy_mnt_ns() */\n#endif // #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT' \
+          fs/namespace.c
+        rm -f fs/namespace.c.rej 2>/dev/null || true
 
     - name: Apply Android 15 6.6 Fake Patches
       shell: bash
