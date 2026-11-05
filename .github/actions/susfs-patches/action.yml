@@ -169,6 +169,10 @@ runs:
             '/^#include "internal.h"$/a #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT\nextern bool susfs_is_current_ksu_domain(void);\nextern struct static_key_true susfs_is_sdcard_android_data_not_decrypted;\n\n#define CL_COPY_MNT_NS BIT(25) /* used by copy_mnt_ns() */\n#endif // #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT' \
             fs/namespace.c
           rm -f fs/namespace.c.rej
+          # KSU 6311a789 + SUSFS 24743360: the credential helpers can end up with
+          # no callers on this pair, which trips -Wunused-function (-Werror).
+          sed -i 's/^static struct cred \*susfs_switch_to_ksu_domain(void) {/static struct cred *__attribute__((unused)) susfs_switch_to_ksu_domain(void) {/' fs/susfs.c
+          sed -i 's/^static void susfs_restore_creds(struct cred \*orig_cred) {/static void __attribute__((unused)) susfs_restore_creds(struct cred *orig_cred) {/' fs/susfs.c
         fi
         if find . -name '*.rej' -print -quit | grep -q .; then
           echo "Unexpected patch rejects:"
