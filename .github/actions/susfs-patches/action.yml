@@ -157,13 +157,24 @@ runs:
       working-directory: ${{ github.workspace }}/kernel/common
       run: |
         # 6.1.145+: GKI dropped include/trace/hooks/blk.h, so the fs/namespace.c
-        # preamble hunk of the SUSFS patch carries a context line that no longer
-        # exists. Drop that one context line from the patch before applying.
-        if [ "${{ inputs.version }}" = "android14-6.1" ] && [ "${{ inputs.sublevel }}" -ge "142" ]; then
-          sed -i '/^ #include <trace\/hooks\/blk.h>$/d' 50_add_susfs_in_gki-${{ inputs.version }}.patch
-          echo "Removed stale trace/hooks/blk.h context line from the SUSFS patch"
+        # preamble hunk of the SUSFS patch rejects. Tolerate that single hunk and
+        # add the two blocks it carries by stable anchors, then fail on any other
+        # reject (so real regressions are not silently swallowed).
+        patch -p1 --forward < 50_add_susfs_in_gki-${{ inputs.version }}.patch || true
+        if [ "${{ inputs.version }}" = "android14-6.1" ]; then
+          grep -q 'linux/susfs_def.h' fs/namespace.c || sed -i \
+            '/^#include <linux\/mnt_idmapping.h>$/a #ifdef CONFIG_KSU_SUSFS\n#include <linux/susfs_def.h>\n#endif // #ifdef CONFIG_KSU_SUSFS' \
+            fs/namespace.c
+          grep -q 'susfs_is_current_ksu_domain' fs/namespace.c || sed -i \
+            '/^#include "internal.h"$/a #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT\nextern bool susfs_is_current_ksu_domain(void);\nextern struct static_key_true susfs_is_sdcard_android_data_not_decrypted;\n\n#define CL_COPY_MNT_NS BIT(25) /* used by copy_mnt_ns() */\n#endif // #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT' \
+            fs/namespace.c
+          rm -f fs/namespace.c.rej
         fi
-        patch -p1 < 50_add_susfs_in_gki-${{ inputs.version }}.patch
+        if find . -name '*.rej' -print -quit | grep -q .; then
+          echo "Unexpected patch rejects:"
+          find . -name '*.rej' -print
+          exit 1
+        fi
 
         # SUSFS's OPEN_REDIRECT code unconditionally calls VMA_PAD_START(), which
         # only exists on GKI branches that carry Google's page-size-migration
