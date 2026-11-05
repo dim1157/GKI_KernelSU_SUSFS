@@ -315,7 +315,8 @@ jobs:
           KOWSU_COMMIT="$(resolve_sha https://github.com/KOWX712/KernelSU.git refs/heads/master)"
           emit kowsu_commit "$KOWSU_COMMIT"
           if [ "${{ inputs.use_susfs }}" = "true" ]; then
-            NEXT_COMMIT="$(resolve_sha https://github.com/pershoot/KernelSU-Next.git refs/heads/dev-susfs)"
+            # Pinned to the release-line commit (matches the booting release build).
+            NEXT_COMMIT="6311a78905df3a60d1d814a11038587a4d8cb57a"
           else
             NEXT_COMMIT="$(resolve_sha https://github.com/KernelSU-Next/KernelSU-Next.git refs/heads/dev)"
           fi

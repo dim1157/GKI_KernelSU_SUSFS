@@ -89,6 +89,17 @@ runs:
           echo "Root commit mismatch: expected $expected_commit, got $actual_commit." >&2
           exit 1
         fi
+
+        # ---- optional repo patch: kernel/selinux cached-SID fallback ------ #
+        patch_file="${GITHUB_WORKSPACE}/patches/ksu-cached-sid-fallback.patch"
+        if [ -f "$patch_file" ]; then
+          echo "[+] applying $(basename "$patch_file") to $directory"
+          git -C "$directory" apply --verbose "$patch_file" \
+            || { echo "ERROR: $patch_file failed to apply" >&2; exit 1; }
+          echo "[+] patch ok: $(git -C "$directory" status --porcelain | wc -l) file(s) changed"
+        else
+          echo "[i] no repo patch at $patch_file (skipping)"
+        fi
         if [ ! -f "$directory/kernel/Kconfig" ] || [ ! -f "$directory/kernel/Makefile" ]; then
           echo "Selected root checkout does not contain a kernel integration." >&2
           exit 1
