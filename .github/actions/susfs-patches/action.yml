@@ -162,10 +162,10 @@ runs:
         # reject (so real regressions are not silently swallowed).
         patch -p1 --forward < 50_add_susfs_in_gki-${{ inputs.version }}.patch || true
         if [ "${{ inputs.version }}" = "android14-6.1" ]; then
-          grep -q 'linux/susfs_def.h' fs/namespace.c || sed -i \
+          grep -q '#include <linux/susfs_def.h>' fs/namespace.c || sed -i \
             '/^#include <linux\/mnt_idmapping.h>$/a #ifdef CONFIG_KSU_SUSFS\n#include <linux/susfs_def.h>\n#endif // #ifdef CONFIG_KSU_SUSFS' \
             fs/namespace.c
-          grep -q 'susfs_is_current_ksu_domain' fs/namespace.c || sed -i \
+          grep -q 'extern bool susfs_is_current_ksu_domain' fs/namespace.c || sed -i \
             '/^#include "internal.h"$/a #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT\nextern bool susfs_is_current_ksu_domain(void);\nextern struct static_key_true susfs_is_sdcard_android_data_not_decrypted;\n\n#define CL_COPY_MNT_NS BIT(25) /* used by copy_mnt_ns() */\n#endif // #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT' \
             fs/namespace.c
           rm -f fs/namespace.c.rej
