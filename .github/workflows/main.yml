@@ -243,7 +243,7 @@ jobs:
             [susfs_commit_android13_5_10]="5326e21a7eb232f9e21debdd5164e99bee3d1e2f"
             [susfs_commit_android13_5_15]="687d2d18d94cb2e3e72d1074778d58384d58e379"
             [susfs_commit_android14_5_15]="6ba6ca79f85b8873b54573842093a9ae2df56cf9"
-            [susfs_commit_android14_6_1]="24743360ea08d98f6ad72b856851abed8de5854f"
+            [susfs_commit_android14_6_1]="8b25990241174fe88d2131a9929e36b5e5ffb1d0"
             [susfs_commit_android15_6_6]="a0f9c59e2243f8a5db955f4ad1686d5e0ad26e1a"
             [susfs_commit_android16_6_12]="b213c54126fb243595ce7876e91d84d6e0861fec"
           )
@@ -254,7 +254,7 @@ jobs:
             [susfs_commit_android13_5_10]="5326e21a7eb232f9e21debdd5164e99bee3d1e2f"
             [susfs_commit_android13_5_15]="687d2d18d94cb2e3e72d1074778d58384d58e379"
             [susfs_commit_android14_5_15]="6ba6ca79f85b8873b54573842093a9ae2df56cf9"
-            [susfs_commit_android14_6_1]="24743360ea08d98f6ad72b856851abed8de5854f"
+            [susfs_commit_android14_6_1]="8b25990241174fe88d2131a9929e36b5e5ffb1d0"
             [susfs_commit_android15_6_6]="a0f9c59e2243f8a5db955f4ad1686d5e0ad26e1a"
             [susfs_commit_android16_6_12]="b213c54126fb243595ce7876e91d84d6e0861fec"
           )
@@ -264,7 +264,7 @@ jobs:
             [susfs_commit_android13_5_10]="5326e21a7eb232f9e21debdd5164e99bee3d1e2f"
             [susfs_commit_android13_5_15]="687d2d18d94cb2e3e72d1074778d58384d58e379"
             [susfs_commit_android14_5_15]="6ba6ca79f85b8873b54573842093a9ae2df56cf9"
-            [susfs_commit_android14_6_1]="24743360ea08d98f6ad72b856851abed8de5854f"
+            [susfs_commit_android14_6_1]="8b25990241174fe88d2131a9929e36b5e5ffb1d0"
             [susfs_commit_android15_6_6]="a0f9c59e2243f8a5db955f4ad1686d5e0ad26e1a"
             [susfs_commit_android16_6_12]="b213c54126fb243595ce7876e91d84d6e0861fec"
           )
@@ -316,7 +316,7 @@ jobs:
           emit kowsu_commit "$KOWSU_COMMIT"
           if [ "${{ inputs.use_susfs }}" = "true" ]; then
             # Pinned to the release-line commit (matches the booting release build).
-            NEXT_COMMIT="4c5853188012f63a1a1fedd4a57fda6375fecb38"
+            NEXT_COMMIT="d21e0a66c887ae4bc75b7c9f83e41761819ec09a"
           else
             NEXT_COMMIT="$(resolve_sha https://github.com/KernelSU-Next/KernelSU-Next.git refs/heads/dev)"
           fi
